@@ -248,7 +248,11 @@ async fn select(
     for (i, column) in row.columns().iter().enumerate() {
       let info = column.type_info();
       let v = if info.is_null() {
-        JsonValue::Null
+        if let Ok(s) = row.try_get(i) {
+          JsonValue::String(s)
+        } else {
+          JsonValue::Null
+        }
       } else {
         match info.name() {
           "VARCHAR" | "STRING" | "TEXT" | "DATETIME" => {
